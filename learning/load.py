@@ -1,15 +1,14 @@
-from PIL import Image
 import os
+from PIL import Image
 
-
-class DirImage:
-    def __init__(self):
-        self.path_dir = '../../fresh_img/' #가져올 파일들이 있는 directory path
+class Load:
+    def __init__(self, str_path):
+        self.path_dir = str_path #가져올 파일들이 있는 directory path
 
     # filename을 추출하는 함수
     def load_filename(self):
         filename_list = os.listdir(self.path_dir)
-        filename_list.remove('.DS_Store')
+        filename_list.remove('.DS_Store') # macOS
         print(filename_list) # debug log
 
         filename_list.sort() 
@@ -28,11 +27,3 @@ class DirImage:
         img_list.sort()
 
         return img_list
-
-# test
-if __name__ == "__main__":
-    obj_dirImg = DirImage()
-    filename_list = obj_dirImg.load_filename()
-    img_list = obj_dirImg.load_img(filename_list)
-    # for i in range(0, len(img_list)):
-    #     img_list[i].save(str(i)+".png")

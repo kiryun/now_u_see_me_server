@@ -13,10 +13,9 @@ const uploader = require('./media.uploader');
 
 //1. event에 대한 image 들을 받는다.
 //2. storage에 data 저장 
-//3. db에 path, type = fresh, eventname(time) 저장
+//3. db에 path, type = fresh, eventname(time) 저장 
 //post 요청
-
-router.post('/capture', uploader.uploader.array('file', 8), controller.new_media);
+router.post('/capture', uploader.uploader.array('file', 8), controller.create);
 
 /**************************************************** */
 //만약 받은 내용이 unknown이라면(learning 에서 unknown이라면)

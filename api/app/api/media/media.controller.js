@@ -1,7 +1,7 @@
 const models = require('../../models/models');
 
-exports.new_media = (req, res) => {
-    console.log("new media");
+exports.create = (req, res) => {
+    console.log("create");
 
     let files = req.files;
 
@@ -17,7 +17,6 @@ exports.new_media = (req, res) => {
         // console.log(result); // undefined, why?
         // console.log(files);
 
-        // db에 저장
         // {event_Time(first file name)}
         // {path(derectory location img0 ~ img6)}
         // {type} = fresh(0)
@@ -31,14 +30,18 @@ exports.new_media = (req, res) => {
 
         models.Media.create({
             eventTime: img_addrs[0],
-            type: 0,
+            type0: 0,
+            type1: 0,
+            type2: 0,
+            type3: 0,
+            type4: 0,
+            type5: 0,
             img0_addr: "../../fresh_img/"+img_addrs[0],
             img1_addr: "../../fresh_img/"+img_addrs[1],
             img2_addr: "../../fresh_img/"+img_addrs[2],
             img3_addr: "../../fresh_img/"+img_addrs[3],
             img4_addr: "../../fresh_img/"+img_addrs[4],
-            img5_addr: "../../fresh_img/"+img_addrs[5],
-            img6_addr: "../../fresh_img/"+img_addrs[6]
+            img5_addr: "../../fresh_img/"+img_addrs[5]
         }).then((media) => res.status(201).json(media));
     }
 }
@@ -46,15 +49,31 @@ exports.new_media = (req, res) => {
 exports.update = (req, res) => {
     console.log(req.body.eventTime);
     eventTime = req.body.eventTime;
+    types = req.body.types;
+    img_addrs = req.body.img_addrs;
+
     if(eventTime == null){
         res.status(404).json({error: 'eventTime is null!'});
     }else{
         // Media table안에 
-        // type을 1로 바꿈
+        // type들을 req.types[i]에 맞게 바꿔줌
+        // img_addr의 위치도 req.img_addrs[i]에 맞게 바꿔줌
         // where? -> eventTime 이름이 일치하는 테이블
         models.Media.update(
-            {type: 1}, // unknown
-            //unknown에 대한 변경된 폴더 명도 적어줘야함
+            {
+                type0: types[0],
+                type1: types[1],
+                type2: types[2],
+                type3: types[3],
+                type4: types[4],
+                type5: types[5],
+                img0_addr: img_addrs[0],
+                img1_addr: img_addrs[1],
+                img2_addr: img_addrs[2],
+                img3_addr: img_addrs[3],
+                img4_addr: img_addrs[4],
+                img5_addr: img_addrs[5]
+            },
             {where: {eventTime: eventTime}, returning: true}
         ).then(function(result){
             res.json(result[1][0]);

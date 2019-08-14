@@ -8,26 +8,18 @@
 # img1_addr = ./unknown_img/{filenamelist[0]}/filenamelist[1]
 # ...
 # ...
+# 연산 후 결과가 true이면(우리집 사람이라면) 어케함?
+# 결과가 true이면 storage에 있는 데이터 삭제 후 
+# 서버에 db에 있는 내용 삭제하라고 알려줌
+
 import shutil
-import load_img
 import os
 
-src_path = '../../fresh_img/'
-dir_path = ''
-dir_path1 = '../../unknown_img/'
-dir_path2 = ''
-
-obj_dirImg = load_img.DirImage() # fresh_img에 있는 filname 가져오는 객체 선언
-
-filename_list = obj_dirImg.load_filename() # fresh_img에 filname 가져오기
-dir_path2 = filename_list[0] # 그중 첫번째를 path2에 저장
-dir_path = dir_path1 + dir_path2+'/' # ./unknown/{eventTime}으로 path 지정
-
-# 그럴리 없겠지만 아무것도 없는거 가져오는지 확인
-if len(filename_list) != 0:
+# pram: 이동시킬 파일 리스트, 출발지, 이동시킬 목적지
+def mv_file(filename_list, src_path, des_path):
     # 디렉터리 없는지 체크하고 만들어주기
-    if not os.path.isdir(dir_path):
-        os.mkdir(dir_path)
+    if not os.path.isdir(des_path):
+        os.mkdir(des_path)
     # 파일 이동하기 src에서 dir로 
     for each in filename_list:
-        shutil.move(src_path+each, dir_path+each)
+        shutil.move(src_path+each, des_path+each)
