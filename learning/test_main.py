@@ -37,36 +37,30 @@ if __name__ == "__main__":
     filename_list = ld.load_filename()
     img_list = ld.load_img(filename_list)
 
-
     unknown_path2 = filename_list[0]
     unknown_path = unknown_path1 + unknown_path2 + '/' # ./unknown/{eventTime}으로 path 지정
 
     # fresh_img에 있는 파일들 전부 unknown으로 이동 시키기
-
+    list_des = [] # 옮겨진 파일 dir
     if len(filename_list) != 0:
-        mv_file.mv_file(filename_list, fresh_path, unknown_path)
-
+        list_des = mv_file.mv_file(filename_list, fresh_path, unknown_path)
+    print(list_des)
 
     ### deep learning function input ###
     print("deep learning function input")
 
-    # test_result = {
-    #     ['2019-07-09-10-010-01', '2019-07-09-10-010-02', '2019-07-09-10-010-03', '2019-07-09-10-010-04', '2019-07-09-10-010-05', '2019-07-09-10-010-06'],
-    #     [False, False, False, True, False, True]
-    # }
-
     test_result = {
-        ['2019-07-09-10-010-01', '2019-07-09-10-010-02', '2019-07-09-10-010-03', '2019-07-09-10-010-04', '2019-07-09-10-010-05', '2019-07-09-10-010-06'],
-        [0, 0, 0, 1, 0, 1]
+        'eventTime': '2019-07-09-10-010-01.jpg',
+        'img_addrs': ['../unknown_img/2019-07-09-10-010-01.jpg/2019-07-09-10-010-04.jpg', 
+        '../unknown_img/2019-07-09-10-010-01.jpg/2019-07-09-10-010-06.jpg'],
+        'types': ['1', '1']
     }
 
-
-
-
     # json parsing
-    json_result = json.dumps(test_result)
-    
-    cm.post_status_update(json_result)
+    json_result = json.dumps(test_result) # json 파싱하면 지금 안됨 왜그러지?
+    # print(json_result)
+
+    cm.post_status_update(test_result)
 
 
 

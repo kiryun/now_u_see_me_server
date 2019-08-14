@@ -14,26 +14,17 @@ const User = sequelize.define('user', {
     name: Sequelize.STRING
 });
 
-const Media = sequelize.define('media', {
+const Event = sequelize.define('event', {
     eventTime: Sequelize.STRING,
+    // sequelize.string default 255
     //types- 0: fresh, 1: unknown, 2: family, 3: friends
-    type0: Sequelize.INTEGER,
-    type1: Sequelize.INTEGER,
-    type2: Sequelize.INTEGER,
-    type3: Sequelize.INTEGER,
-    type4: Sequelize.INTEGER,
-    type5: Sequelize.INTEGER,
-    //images address max 6
-    img0_addr: Sequelize.STRING,
-    img1_addr: Sequelize.STRING,
-    img2_addr: Sequelize.STRING,
-    img3_addr: Sequelize.STRING,
-    img4_addr: Sequelize.STRING,
-    img5_addr: Sequelize.STRING
+    types: Sequelize.STRING,
+    img_addrs: Sequelize.STRING
 });
+
 
 module.exports = {
     sequelize: sequelize,
     User: User,
-    Media: Media
+    Event: Event
 }

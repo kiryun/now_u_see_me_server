@@ -6,6 +6,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/users', require('./api/users'));
-app.use('/media', require('./api/media'));
+app.use('/event', require('./api/event'));
 
 module.exports = app;

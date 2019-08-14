@@ -24,6 +24,6 @@ class Load:
             img_obj = Image.open(self.path_dir+each)
             img_list.append(img_obj)
             
-        img_list.sort()
+        # img_list.sort() # list에 현재 있는게 stirng이나 integer가 아닌 순수 image 파일이므로 정렬 안됨
 
         return img_list
