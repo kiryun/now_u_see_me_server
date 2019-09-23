@@ -1,5 +1,9 @@
 const models = require('../../models/models');
-const fcm = require('./event.fcm');
+// const fcm = require('./event.fcm');
+var FCM = require('fcm-node');
+
+var serverKey = 'AAAAUPlFQ-I:APA91bGISszRb6F6tFSKCM6qkP_hDlDVhUBdCIMiKED5wtsNI06pt28RxYnn78igZwld5Zf6fz5e3eDMPCyn8uvyNIlyOJKc2KFd3APE84p9c52cxLK9x-p84iW7bkY1m2ON8r9ijWKC';
+var fcm = new FCM(serverKey);
 
 exports.create = (req, res) => {
     console.log("create");
@@ -102,31 +106,54 @@ exports.update = (req, res) => {
 
 exports.token = (req, res) => {
     console.log('token');
-    console.log(req);
-    var client_token = req.deviceToken;
+    // console.log(req);
+    var client_token = req.data;
+    if(client_token == null){
+        res.status(404).json({error: 'Token post error!'});
+    }else{
+        res.status(201).json({res: 'Token post success!'});
+        
+        var push_data = {
+            to: client_token,
+            // app이 실행중이지 않을 때 상태바 알림으로 등록할 내용
+            notification: {
+                title: "Warnning",
+                body: "check for this picture",
+                sound: "default",
+                client_token: "FCM_PLUGIN_ACTIVITY",
+                icon: "fcm_push_icon"
+            },
+            // message 중요도
+            priority: "high",
+            // app package name
+            restricted_package_name: "com.dev.kih.nusm",
+            // app에게 전달할 데이터
+            data: {
+                num1: "notification from node.js"
+                // num2: 3000
+            }
+        };
 
-    var push_data = {
-        to: client_token,
-        // app이 실행중이지 않을 때 상태바 알림으로 등록할 내용
-        notification: {
-            title: "Warnning",
-            body: "check for this picture",
-            sound: "default",
-            client_token: "FCM_PLUGIN_ACTIVITY",
-            icon: "fcm_push_icon"
-        },
-        // message 중요도
-        priority: "high",
-        // app package name
-        restricted_package_name: "com.dev.kih.nusm",
-        // // app에게 전달할 데이터
-        // data: {
-        //     num1: 2000,
-        //     num2: 3000
-        // }
-    };
+        fcm.send(push_data, function(err, response){
+            if(err){
+                console.error("Push 발송에 실패");
+                console.error(err);
+                return;
+            }else{
+                console.log('Push 성공');
+            console.log(response);
+            console.log(response.results);
+            }
+        });
+    }
+    
+    //  토큰 받았으면
+    // 1. db에 토큰 값 저장(덮어쓰기)
+    // 2. notification 알림 보내기
+    // 3. 모바일에서 post 요청
+    // 4. ,,,
 }
-
+``
 // unknown 이미지 보내주기
 exports.unknown = (req, res) => {
     
