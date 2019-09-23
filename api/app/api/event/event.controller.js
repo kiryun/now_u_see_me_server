@@ -1,4 +1,5 @@
 const models = require('../../models/models');
+const fcm = require('./event.fcm');
 
 exports.create = (req, res) => {
     console.log("create");
@@ -50,6 +51,11 @@ exports.create = (req, res) => {
     }
 }
 
+// 이미지에 대한 정보를 
+// update해준다.
+// learning에서는 unknown이미지가 오고
+// mobile에서는 사용자가 설정한 값이 들어온다.
+// mobile쪽에서 올경우에는 local storage를 변경해서 learning에게 알려줘야 한다.
 exports.update = (req, res) => {
     // console.log(req);
     eventTime = req.body.eventTime;
@@ -86,13 +92,51 @@ exports.update = (req, res) => {
             {where: {eventTime: eventTime}, returning: true}
         ).then(function(result){
             res.json(result[1][0]);
+            //test fcm
+            // fcm.push;
         }).catch(function(err){
             return res.status(404).json({err:'Undefined error!'});
         });
     }
 }
 
+exports.token = (req, res) => {
+    console.log('token');
+    console.log(req);
+    var client_token = req.deviceToken;
+
+    var push_data = {
+        to: client_token,
+        // app이 실행중이지 않을 때 상태바 알림으로 등록할 내용
+        notification: {
+            title: "Warnning",
+            body: "check for this picture",
+            sound: "default",
+            client_token: "FCM_PLUGIN_ACTIVITY",
+            icon: "fcm_push_icon"
+        },
+        // message 중요도
+        priority: "high",
+        // app package name
+        restricted_package_name: "com.dev.kih.nusm",
+        // // app에게 전달할 데이터
+        // data: {
+        //     num1: 2000,
+        //     num2: 3000
+        // }
+    };
+}
+
+// unknown 이미지 보내주기
+exports.unknown = (req, res) => {
+    
+}
+
 //delete는 mobile쪽에서 yes 와 no를 선택하냐에 따라서 다르게 동작함
 exports.delete = (req, res) => {
 
+}
+
+exports.test = (req, res) => {
+    console.log('test get');
 }

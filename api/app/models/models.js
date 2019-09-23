@@ -11,7 +11,8 @@ const sequelize = new Sequelize(
 );
 
 const User = sequelize.define('user', {
-    name: Sequelize.STRING
+    name: Sequelize.STRING,
+    token: Sequelize.STRING
 });
 
 const Event = sequelize.define('event', {
