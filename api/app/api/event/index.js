@@ -18,7 +18,7 @@ router.get('/test', controller.test);
 //2. storage에 data 저장 
 //3. db에 path, type = fresh, eventname(time) 저장 
 //post 요청
-router.post('/send', uploader.uploader.array('file', 8), controller.create);
+router.post('/send', uploader.uploader.array('file', 8), controller.send);
 
 /**************************************************** */
 //만약 받은 내용이 unknown이라면(learning 에서 unknown이라면)
@@ -28,7 +28,7 @@ router.post('/send', uploader.uploader.array('file', 8), controller.create);
 
 //post 요청
 // router.post('/update/:eventTime', controller.update);
-router.post('/update', controller.update);
+router.post('/unknown', controller.unknown);
 
 // 모바일에서
 // fcm을 사용하기 위한 token 생성 시 server로 보내야 함

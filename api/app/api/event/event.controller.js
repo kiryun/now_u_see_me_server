@@ -5,8 +5,8 @@ var FCM = require('fcm-node');
 var serverKey = 'AAAAUPlFQ-I:APA91bGISszRb6F6tFSKCM6qkP_hDlDVhUBdCIMiKED5wtsNI06pt28RxYnn78igZwld5Zf6fz5e3eDMPCyn8uvyNIlyOJKc2KFd3APE84p9c52cxLK9x-p84iW7bkY1m2ON8r9ijWKC';
 var fcm = new FCM(serverKey);
 
-exports.create = (req, res) => {
-    console.log("create");
+exports.send = (req, res) => {
+    console.log("send");
 
     let files = req.files;
 
@@ -57,27 +57,28 @@ exports.create = (req, res) => {
 
 // 이미지에 대한 정보를 
 // update해준다.
-// learning에서는 unknown이미지가 오고
-// mobile에서는 사용자가 설정한 값이 들어온다.
-// mobile쪽에서 올경우에는 local storage를 변경해서 learning에게 알려줘야 한다.
-exports.update = (req, res) => {
+// learning에서 unknown이미지가 오고
+// notification 알람을 준다.
+exports.unknown = (req, res) => {
     // console.log(req);
-    eventTime = req.body.eventTime;
-    types = req.body.types;
-    img_addrs = req.body.img_addrs;
+    let eventTime = req.body.eventTime; // event time
+    let types = req.body.types; // unknown, friends, family
+    let img_addrs = req.body.img_addrs; // image address
+
     console.log(eventTime);
     console.log(types);
     console.log(img_addrs);
 
     str_types = '';
     str_addrs = '';
+
     for(i = 0; i<img_addrs.length; i++){
         if( i != img_addrs.length - 1){
             str_types += types[i]+',';
-            str_addrs += "../fresh_img/"+img_addrs[i]+',';
+            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]+',';
         }else{
             str_types += types[i];
-            str_addrs += "../fresh_img/"+img_addrs[i]
+            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]
         }
     }
 
@@ -96,23 +97,91 @@ exports.update = (req, res) => {
             {where: {eventTime: eventTime}, returning: true}
         ).then(function(result){
             res.json(result[1][0]);
-            //test fcm
-            // fcm.push;
+
+            //fcm
+            var push_data = {
+                to: client_token,
+                // app이 실행중이지 않을 때 상태바 알림으로 등록할 내용
+                notification: {
+                    title: "Warnning",
+                    body: "check for this picture",
+                    sound: "default",
+                    client_token: "FCM_PLUGIN_ACTIVITY",
+                    icon: "fcm_push_icon"
+                },
+                // message 중요도
+                priority: "high",
+                // app package name
+                restricted_package_name: "com.dev.kih.nusm",
+                // app에게 전달할 데이터 notification identity를 보내줘야 함
+                data: {
+                    num1: eventTime
+                }
+            };
         }).catch(function(err){
             return res.status(404).json({err:'Undefined error!'});
         });
     }
 }
 
+// 모바일에서 선택한 사진 type update
+// 
+exports.update = (req, res) => {
+    let eventTime = req.body.eventTime; // event time
+    let types = req.body.types; // unknown, friends, family
+    let img_addrs = req.body.img_addrs; // image address
+
+    console.log(eventTime);
+    console.log(types);
+    console.log(img_addrs);
+
+    str_types = '';
+    str_addrs = '';
+
+    for(i = 0; i<img_addrs.length; i++){
+        if( i != img_addrs.length - 1){
+            str_types += types[i]+',';
+            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]+',';
+        }else{
+            str_types += types[i];
+            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]
+        }
+    }
+
+    if(eventTime == null){
+        res.status(404).json({error: 'eventTime is null!'});
+    }else{
+        models.Event.update(
+            {
+                types: str_types,
+                img_addrs: str_addrs
+            },
+            {where: {eventTime: eventTime}, returning: true}
+        ).then(function(result){
+            // db update 완료 하면
+            
+            res.status(201).json({res: 'update success from unknown img'});
+            // res.json(result[1][0]);
+        }).catch(function(err){
+            return res.status(404).json({err:'model update error!'});
+        });
+
+        
+    }
+
+}
+
 exports.token = (req, res) => {
-    console.log('token');
-    // console.log(req);
-    var client_token = req.data;
+    // console.log('token');
+    console.log(req.body.data);
+
+    var client_token = req.body.data;
     if(client_token == null){
         res.status(404).json({error: 'Token post error!'});
     }else{
         res.status(201).json({res: 'Token post success!'});
         
+        // test용
         var push_data = {
             to: client_token,
             // app이 실행중이지 않을 때 상태바 알림으로 등록할 내용
@@ -146,17 +215,6 @@ exports.token = (req, res) => {
             }
         });
     }
-    
-    //  토큰 받았으면
-    // 1. db에 토큰 값 저장(덮어쓰기)
-    // 2. notification 알림 보내기
-    // 3. 모바일에서 post 요청
-    // 4. ,,,
-}
-``
-// unknown 이미지 보내주기
-exports.unknown = (req, res) => {
-    
 }
 
 //delete는 mobile쪽에서 yes 와 no를 선택하냐에 따라서 다르게 동작함
