@@ -1,6 +1,6 @@
 const app = require('../app/app');
 const port = 3000;
-const hostname = '192.168.0.130';
+const hostname = 'localhost';//'192.168.0.130';
 const syncDatabase = require('./sync-database');
 
 app.listen(port, hostname, () => {
