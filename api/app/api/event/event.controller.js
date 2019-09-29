@@ -10,9 +10,11 @@ var client_token;
 // CAM에서 찍은 사용자 image를 보낼때 호출된다.
 exports.upload = (req, res) => {
     console.log("/event/upload");
+    // console.log(req);
     let files = req.files;
     
     if(files == null){
+        console.log("file not transfer!");
         res.status(404).json({error: 'File not transfer!'});
     }
     
@@ -37,8 +39,9 @@ exports.upload = (req, res) => {
         }
     }
 
+    img_addrs[0].replace(".jpg","");
     models.Event.create({
-        eventTime: img_addrs[0] - ".jpg",
+        eventTime: img_addrs[0],
         types: str_types,
         img_addrs: str_addrs
     })
@@ -48,6 +51,7 @@ exports.upload = (req, res) => {
     })
     // 실패라면 404 응답
     .catch(function(err){
+        console.log(err);
         return res.status(404).json({err:'error: Do not create table '+img_addrs[0]});
     });
 }
@@ -235,7 +239,7 @@ exports.update = (req, res) => {
         // 그에 맞는 directory에 파일을 이동시켜 준다.
         for(i=0; i<img_addrs.length; i++){
             if(types[i] == '1'){ // family
-                let new_path = '../family/'+eventTime;
+                let new_path = '../family/';
                 fs.rename(img_addrs[i], new_path, function(err){
                     if(err){
                         console.log("Family 이동 실패");
@@ -247,7 +251,7 @@ exports.update = (req, res) => {
                     }
                 })
             }else if(types[i] == '2'){ // friends
-                let new_path = '../friends/'+eventTime;
+                let new_path = '../friends/';
                 fs.rename(img_addrs[i], new_path, function(err){
                     if(err){
                         console.log("Friends 이동 실패");
