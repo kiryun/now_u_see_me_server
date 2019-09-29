@@ -32,10 +32,10 @@ exports.upload = (req, res) => {
     for(i = 0; i<img_addrs.length; i++){
         if( i != img_addrs.length - 1){
             str_types += '0,';
-            str_addrs += "../fresh_img/"+img_addrs[i]+',';
+            str_addrs += "../fresh/"+img_addrs[i]+',';
         }else{
             str_types += '0';
-            str_addrs += "../fresh_img/"+img_addrs[i]
+            str_addrs += "../fresh/"+img_addrs[i]
         }
     }
 
@@ -77,10 +77,10 @@ exports.unknown = (req, res) => {
     for(i = 0; i<img_addrs.length; i++){
         if( i != img_addrs.length - 1){
             str_types += types[i]+',';
-            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]+',';
+            str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';
         }else{
             str_types += types[i];
-            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]
+            str_addrs += "../unknown/"+eventTime+img_addrs[i]
         }
     }
 
@@ -213,10 +213,10 @@ exports.update = (req, res) => {
     for(i = 0; i<img_addrs.length; i++){
         if( i != img_addrs.length - 1){
             str_types += types[i]+',';
-            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]+',';
+            str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';
         }else{
             str_types += types[i];
-            str_addrs += "../unknown_img/"+eventTime+img_addrs[i]
+            str_addrs += "../unknown/"+eventTime+img_addrs[i]
         }
     }
 
