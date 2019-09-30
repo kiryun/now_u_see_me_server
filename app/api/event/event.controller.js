@@ -31,11 +31,11 @@ exports.upload = (req, res) => {
 
     for(i = 0; i<img_addrs.length; i++){
         if( i == img_addrs.length - 1){
-            str_types += '0';
-            str_addrs += img_addrs[i];//"../fresh/"+img_addrs[i];
+            str_types += 'fresh';
+            str_addrs += "../fresh/"+img_addrs[i];//img_addrs[i];//"../fresh/"+img_addrs[i];
         }else{
-            str_types += '0,';
-            str_addrs += img_addrs[i]+',';//"../fresh/"+img_addrs[i]+',';
+            str_types += 'fresh,';
+            str_addrs += "../fresh/"+img_addrs[i]+',';//img_addrs[i]+',';//"../fresh/"+img_addrs[i]+',';
         }
     }
 
@@ -77,10 +77,10 @@ exports.unknown = (req, res) => {
     for(i = 0; i<img_addrs.length; i++){
         if( i == img_addrs.length - 1){
             str_types += types[i];
-            str_addrs += img_addrs[i];//"../unknown/"+eventTime+img_addrs[i];
+            str_addrs += "../unknown/"+eventTime+img_addrs[i];//img_addrs[i];//"../unknown/"+eventTime+img_addrs[i];
         }else{
             str_types += types[i]+',';
-            str_addrs += img_addrs[i]+',';//"../unknown/"+eventTime+img_addrs[i]+',';
+            str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';//img_addrs[i]+',';//"../unknown/"+eventTime+img_addrs[i]+',';
         }
     }
     console.log(str_types);
@@ -213,71 +213,115 @@ exports.update = (req, res) => {
     // 1. 사용자(모바일)에게 받은 제대로된 type을 받는다.
     let eventTime = req.body.eventTime; // event time
     let types = req.body.types; // unknown, friends, family
-    let img_addrs = req.body.img_addrs; // image address
+    let imageName = req.body.imageName; // image address
 
-    // console.log(eventTime);
-    // console.log(types);
-    // console.log(img_addrs);
+    console.log(eventTime);
+    console.log(types);
+    console.log(imageName);
 
     // 2. 받은 데이터를 table형식으로 맞춰준다.
-    str_types = '';
-    str_addrs = '';
+    // str_types = '';
+    // str_names = '';
 
-    for(i = 0; i<img_addrs.length; i++){
-        if( i == img_addrs.length - 1){
-            str_types += types[i];
-            str_addrs += "../unknown/"+eventTime+img_addrs[i];
-        }else{
-            str_types += types[i]+',';
-            str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';
-        }
-    }
+    // for(i = 0; i<img_addrs.length; i++){
+    //     if( i == img_addrs.length - 1){
+    //         str_types += types[i];
+    //         str_addrs += "../unknown/"+eventTime+img_addrs[i];
+    //     }else{
+    //         str_types += types[i]+',';
+    //         str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';
+    //     }
+    // }
 
     if(eventTime == null){
-        res.status(404).json({error: 'eventTime is null!'});
+        res.status(404).json({err: 'eventTime is null!'});
     }
-    // 3. eventTime을 이용해 types, img_addrs를 update해준다.
-    models.Event.update(
-        {
-            types: str_types,
-            img_addrs: str_addrs
-        },
-        {where: {eventTime: eventTime}, returning: true}
-    ).then(function(event){
-        var img_addrs =event.img_addrs;
-        var types = event.types;
 
-        // 4. img_addrs의 idx와 types의 idx는 서로 1:1 대응된다.
-        // 따라서 types[i]가 1이면 family, 2이면 friends으로 분류하고
-        // 그에 맞는 directory에 파일을 이동시켜 준다.
-        for(i=0; i<img_addrs.length; i++){
-            if(types[i] == '1'){ // family
-                let new_path = '../family/';
-                fs.rename(img_addrs[i], new_path, function(err){
-                    if(err){
-                        console.log("Family 이동 실패");
-                        return res.status(404).json({err: 'Failed to move '+img_addrs[i]+'to fmaily directory'});
-                    }else{
-                        // 5. 그리고 제대로 이동이 되었다면 eventTime: req.body.eventTime을 받는 table은 삭제해준다.
-                        console.log("Family 이동 성공");
-                        // res.json({res: 'Failed to move '+img_addrs[i]+'to fmaily directory'});
-                    }
-                })
-            }else if(types[i] == '2'){ // friends
-                let new_path = '../friends/';
-                fs.rename(img_addrs[i], new_path, function(err){
-                    if(err){
-                        console.log("Friends 이동 실패");
-                        return res.status(404).json({err: 'Failed to move '+img_addrs[i]+'to friends directory'});
-                    }else{
-                        console.log("Friends 이동 성공");
-                    }
-                })
+    // 3. 분류된 사진을 폴더에 재배치 해준다.
+    var path = '../unknown/'+eventTime+"/";
+    for(i=0; i<imageName.length; i++){
+        if(types[i] == 'Family'){ // family
+            let new_path = '../family/'+eventTime+imageName[i];
+            fs.rename(path+imageName[i], new_path, function(err){
+                if(err){
+                    console.log("Family 이동 실패");
+                    return res.status(404).json({err: 'Failed to move '+imageName[i]+'to fmaily directory'});
+                }else{
+                    // 5. 그리고 제대로 이동이 되었다면 eventTime: req.body.eventTime을 받는 table은 삭제해준다.
+                    console.log("Family 이동 성공");
+                    // res.json({res: 'Failed to move '+img_addrs[i]+'to fmaily directory'});
+                }
+            })
+        }else if(types[i] == 'Friends'){ // friends
+            let new_path = '../friends/'+eventTime+imageName[i];
+            fs.rename(path+imageName[i], new_path, function(err){
+                if(err){
+                    console.log("Friends 이동 실패");
+                    return res.status(404).json({err: 'Failed to move '+imageName[i]+'to friends directory'});
+                }else{
+                    console.log("Friends 이동 성공");
+                }
+            })
+        }
+    }
+
+    // 4. row 삭제
+    models.Event.destroy(
+        {
+            where: {
+                eventTime: eventTime
             }
         }
-    }).catch(function(err){
-        return res.status(404).json({err:'No such incoreect table:  '+eventTime});
+    ).then(function(result) {
+        console.log(eventTime+"삭제 성공");
+        // res.json({});
+    }).catch(function(err) {
+        console.log(err);
+        // return res.status(404).json({err: eventTime+": Failed delete row!"});
     });
+
+    // 3. eventTime을 이용해 types, img_addrs를 update해준다.
+    // models.Event.update(
+    //     {
+    //         types: str_types,
+    //         img_addrs: str_addrs
+    //     },
+    //     {where: {eventTime: eventTime}, returning: true}
+    // ).then(function(event){
+    //     var img_addrs =event.img_addrs;
+    //     var types = event.types;
+
+    //     // 4. img_addrs의 idx와 types의 idx는 서로 1:1 대응된다.
+    //     // 따라서 types[i]가 1이면 family, 2이면 friends으로 분류하고
+    //     // 그에 맞는 directory에 파일을 이동시켜 준다.
+    //     for(i=0; i<img_addrs.length; i++){
+    //         if(types[i] == 'family'){ // family
+    //             let new_path = '../family/';
+    //             fs.rename(img_addrs[i], new_path, function(err){
+    //                 if(err){
+    //                     console.log("Family 이동 실패");
+    //                     return res.status(404).json({err: 'Failed to move '+img_addrs[i]+'to fmaily directory'});
+    //                 }else{
+    //                     // 5. 그리고 제대로 이동이 되었다면 eventTime: req.body.eventTime을 받는 table은 삭제해준다.
+    //                     console.log("Family 이동 성공");
+    //                     // res.json({res: 'Failed to move '+img_addrs[i]+'to fmaily directory'});
+    //                 }
+    //             })
+    //         }else if(types[i] == 'friends'){ // friends
+    //             let new_path = '../friends/';
+    //             fs.rename(img_addrs[i], new_path, function(err){
+    //                 if(err){
+    //                     console.log("Friends 이동 실패");
+    //                     return res.status(404).json({err: 'Failed to move '+img_addrs[i]+'to friends directory'});
+    //                 }else{
+    //                     console.log("Friends 이동 성공");
+    //                 }
+    //             })
+    //         }
+    //     }
+    // }).catch(function(err){
+    //     return res.status(404).json({err:'No such incoreect table:  '+eventTime});
+    // });
 
     res.status(201).json({res: eventTime});
 
