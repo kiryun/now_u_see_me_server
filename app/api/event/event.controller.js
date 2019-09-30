@@ -65,11 +65,31 @@ exports.unknown = (req, res) => {
     //  types: string,
     //  img_addrs: [string, string]
     // }
+    // console.log(req.body);
+    // console.log(typeof req.body.eventTime);
+    // console.log(typeof req.body.types);
+    // console.log(typeof req.body.img_addrs);
+    var eventTime = req.body.eventTime; // event timell
+    var types = [];
+    var img_addrs=[];
+    types.push(req.body.types);
+    img_addrs.push(req.body.img_addrs);
+    // if(typeof req.body.types == "string"){
+    //     types.push(req.body.types)
+    // }else{
 
-    let eventTime = req.body.eventTime; // event time
-    let types = req.body.types; // unknown, friends, family
-    let img_addrs = req.body.img_addrs; // image address
-
+    //     types = req.body.types; // unknown, friends, family
+    // }
+    // if(typeof req.body.img_addrs == "string"){
+    //     img_addrs.push(req.body.img_addrs)
+    // }else{
+    //     img_addrs = req.body.img_addrs; // image address   
+    // }
+    
+    console.log(eventTime);
+    console.log(types);
+    console.log(img_addrs);
+    
     var str_types = '';
     var str_addrs = '';
 
@@ -77,10 +97,10 @@ exports.unknown = (req, res) => {
     for(i = 0; i<img_addrs.length; i++){
         if( i == img_addrs.length - 1){
             str_types += types[i];
-            str_addrs += "../unknown/"+eventTime+img_addrs[i];//img_addrs[i];//"../unknown/"+eventTime+img_addrs[i];
+            str_addrs += "../unknown/"+eventTime+"/"+img_addrs[i];//img_addrs[i];//"../unknown/"+eventTime+img_addrs[i];
         }else{
             str_types += types[i]+',';
-            str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';//img_addrs[i]+',';//"../unknown/"+eventTime+img_addrs[i]+',';
+            str_addrs += "../unknown/"+eventTime+"/"+img_addrs[i]+',';//img_addrs[i]+',';//"../unknown/"+eventTime+img_addrs[i]+',';
         }
     }
     console.log(str_types);
