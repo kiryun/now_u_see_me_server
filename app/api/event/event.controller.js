@@ -12,12 +12,12 @@ exports.upload = (req, res) => {
     console.log("/event/upload");
     // console.log(req);
     let files = req.files;
-    
+
     if(files == null){
         console.log("file not transfer!");
         res.status(404).json({error: 'File not transfer!'});
     }
-    
+
     // 1. image file의 이름을 오름차순으로 정렬해서 mg_addrs에 저장.
     let img_addrs = [];
     files.forEach(element => {
@@ -30,12 +30,12 @@ exports.upload = (req, res) => {
     var str_addrs = '';
 
     for(i = 0; i<img_addrs.length; i++){
-        if( i != img_addrs.length - 1){
-            str_types += '0,';
-            str_addrs += "../fresh/"+img_addrs[i]+',';
-        }else{
+        if( i == img_addrs.length - 1){
             str_types += '0';
-            str_addrs += "../fresh/"+img_addrs[i]
+            str_addrs += img_addrs[i];//"../fresh/"+img_addrs[i];
+        }else{
+            str_types += '0,';
+            str_addrs += img_addrs[i]+',';//"../fresh/"+img_addrs[i]+',';
         }
     }
 
@@ -61,7 +61,7 @@ exports.unknown = (req, res) => {
     console.log("event/unknown")
 
     // {
-    //  eventTime: string, 
+    //  eventTime: string,
     //  types: string,
     //  img_addrs: [string, string]
     // }
@@ -75,15 +75,16 @@ exports.unknown = (req, res) => {
 
     // 1. type과 img_addr를 table 형식에 맡게 바꿔준다.
     for(i = 0; i<img_addrs.length; i++){
-        if( i != img_addrs.length - 1){
-            str_types += types[i]+',';
-            str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';
-        }else{
+        if( i == img_addrs.length - 1){
             str_types += types[i];
-            str_addrs += "../unknown/"+eventTime+img_addrs[i]
+            str_addrs += img_addrs[i];//"../unknown/"+eventTime+img_addrs[i];
+        }else{
+            str_types += types[i]+',';
+            str_addrs += img_addrs[i]+',';//"../unknown/"+eventTime+img_addrs[i]+',';
         }
     }
-
+    console.log(str_types);
+    console.log(str_addrs);
     if(eventTime == null){
         return res.status(404).json({err: 'eventTime is null!'});
     }
@@ -99,6 +100,7 @@ exports.unknown = (req, res) => {
         // res.json(result[1][0]);
 
         // 3. update 성공이면 notification 보낼 자료구조(push_data)를 만든다.
+        // console.log(eventTime)
         var push_data = {
             to: client_token,
             // app이 실행중이지 않을 때 상태바 알림으로 등록할 내용
@@ -122,10 +124,11 @@ exports.unknown = (req, res) => {
         fcm.send(push_data, function(err, response){
             if(err){
                 console.error("Failed notification!");
-                return res.status(404).json({err: "Failed notification!"});
+                console.log(err);
+                // return res.status(404).json({err: "Failed notification!"});
             }else{
                 console.log('Success notification');
-                return res.status(201).json({res: "Success notification"});
+                // return res.status(201).json({res: "Success notification"});
             }
         });
 
@@ -144,9 +147,9 @@ exports.token = (req, res) => {
 
     client_token = req.body.token;
     if(client_token == null){
-        return res.status(404).json({err: 'Token post error!'}); 
+        return res.status(404).json({err: 'Token post error!'});
     }
-    
+
     // token 받았으면 db에 저장
     // but 지금은 어플에서 계속 새로 생성하고 있으니 상관 없음
     res.status(201).json({res: 'Token post success!'});
@@ -163,34 +166,38 @@ exports.images = (req, res) => {
         return res.status(404).json({err: 'eventTime is null! check for URL(/event/images/:eventTime)'});
     }
     // 2. eventTime을 이용해 해당 table 검출
-    models.Event.findOne({
+    models.Event.findAll({
+        attributes: ['img_addrs'],
         where: {
-            eventTime: eventTime
+            eventTime: req.params.eventTime//'2019-9-30-0-6-54-797042.jpg'
         }
     }).then(function(event){
+        // console.log(event[0].toJSON().img_addrs)
         // 3. 검출된 table(event)에서 img_addrs를 img_addrs에 저장
-        var img_addrs = event.img_addrs // event table의 image address
+        var img_addrs = event[0].toJSON().img_addrs; // event table의 image address
+        console.log(img_addrs)
         // 4. img_addrs에 , 기준으로 img_addrs를 split해서 list형태로 저장
-        img_addrs = img_addrs.split(','); // comma 기준으로 자른다.
+        var img_addr_arr = img_addrs.split(','); // comma 기준으로 자른다.
 
         // 5. fs와 img_addrs를 이용해 local storage의 image를 images 변수에 저장한다.
         var images = []; // 보낼 이미지가 담겨있는 변수
 
-        for(i = 0; i<img_addrs.length; i++){
-            fs.readFile(img_addrs[i], function(image){
+        for(i = 0; i<img_addr_arr.length; i++){
+            fs.readFile(img_addr_arr[i], function(image){
                 images.push(image);
             });
         }
-        
+
         res.writeHead(200, {'Content-Type': 'image/jpg'});
         res.write(images);
         res.end();
         // return res.status(201).json({success: 'GET success!, /event/images'});
     }).catch(function(err){
-        return res.status(404).json({err: 'No such incoreect table: '+eventTime});
+        console.log(err);
+        // return res.status(404).json({err: 'No such incoreect table: '+eventTime});
     })
     res.status(201).json({res: eventTime});
-    
+
 }
 
 // 모바일에서 선택한 사진 type update
@@ -211,12 +218,12 @@ exports.update = (req, res) => {
     str_addrs = '';
 
     for(i = 0; i<img_addrs.length; i++){
-        if( i != img_addrs.length - 1){
+        if( i == img_addrs.length - 1){
+            str_types += types[i];
+            str_addrs += "../unknown/"+eventTime+img_addrs[i];
+        }else{
             str_types += types[i]+',';
             str_addrs += "../unknown/"+eventTime+img_addrs[i]+',';
-        }else{
-            str_types += types[i];
-            str_addrs += "../unknown/"+eventTime+img_addrs[i]
         }
     }
 
