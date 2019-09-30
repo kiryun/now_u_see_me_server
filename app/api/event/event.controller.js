@@ -39,15 +39,15 @@ exports.upload = (req, res) => {
         }
     }
 
-    img_addrs[0].replace(".jpg","");
+    let eventTime =img_addrs[0].replace(".jpg","");
     models.Event.create({
-        eventTime: img_addrs[0],
+        eventTime: eventTime,
         types: str_types,
         img_addrs: str_addrs
     })
     // 성공했다면 201 응답
     .then(function(event){
-        return res.status(201).json({res: 'success: create tbale '+img_addrs[0]})
+        return res.status(201).json({res: 'success: create tbale '+eventTime})
     })
     // 실패라면 404 응답
     .catch(function(err){
@@ -169,7 +169,7 @@ exports.images = (req, res) => {
     models.Event.findAll({
         attributes: ['img_addrs'],
         where: {
-            eventTime: req.params.eventTime//'2019-9-30-0-6-54-797042.jpg'
+            eventTime: req.params.eventTime//'2019-9-30-0-6-54-797042'
         }
     }).then(function(event){
         // console.log(event[0].toJSON().img_addrs)
@@ -177,26 +177,32 @@ exports.images = (req, res) => {
         var img_addrs = event[0].toJSON().img_addrs; // event table의 image address
         console.log(img_addrs)
         // 4. img_addrs에 , 기준으로 img_addrs를 split해서 list형태로 저장
-        var img_addr_arr = img_addrs.split(','); // comma 기준으로 자른다.
+        var list_addrs = img_addrs.split(','); // comma 기준으로 자른다.
 
-        // 5. fs와 img_addrs를 이용해 local storage의 image를 images 변수에 저장한다.
-        var images = []; // 보낼 이미지가 담겨있는 변수
+        // 5. image name과 실제 이미지가 있는 url을 보낸다. ../image/image.controller.js 참고
+        console.log(list_addrs)
+        // console.log("eventTime:"+req.params.eventTime);
 
-        for(i = 0; i<img_addr_arr.length; i++){
-            fs.readFile(img_addr_arr[i], function(image){
-                images.push(image);
-            });
+        var response = {};
+        var results = [];
+        for(var i = 0; i<list_addrs.length; i++){
+            var replace_str = '../unknown/'+req.params.eventTime+'/';
+            var name = list_addrs[i].replace(replace_str, "");
+            var url = '/image/unknown/'+req.params.eventTime;
+            
+            var image = {};
+            image['name'] = name;
+            image['url'] = url;
+
+            results.push(image);
+
         }
-
-        res.writeHead(200, {'Content-Type': 'image/jpg'});
-        res.write(images);
-        res.end();
-        // return res.status(201).json({success: 'GET success!, /event/images'});
+        response['images'] = results;
+        return res.status(201).json(response);
     }).catch(function(err){
         console.log(err);
-        // return res.status(404).json({err: 'No such incoreect table: '+eventTime});
+        return res.status(404).json({err: 'No such incoreect table: '+eventTime});
     })
-    res.status(201).json({res: eventTime});
 
 }
 
