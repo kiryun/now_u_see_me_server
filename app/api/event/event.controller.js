@@ -7,6 +7,8 @@ var serverKey = 'AAAAUPlFQ-I:APA91bGISszRb6F6tFSKCM6qkP_hDlDVhUBdCIMiKED5wtsNI06
 var fcm = new FCM(serverKey);
 var client_token;
 
+var rimraf = require("rimraf");
+
 // CAM에서 찍은 사용자 image를 보낼때 호출된다.
 exports.upload = (req, res) => {
     console.log("/event/upload");
@@ -285,6 +287,7 @@ exports.update = (req, res) => {
         }
     }
 
+    rimraf.sync("../unknown/"+eventTime);
     // 4. row 삭제
     models.Event.destroy(
         {
