@@ -2,7 +2,7 @@
 
 ### System Architecture
 
-![SystemArchitecture](/Users/gihyunkim/Documents/Univ/now_u_see_me/README/SystemArchitecture.png)
+![SystemArchitecture](/Users/gihyunkim/Documents/Univ/now_u_see_me/now_u_see_me_ubuntu/now_u_see_me_server/resource/SystemArchitecture.png)
 
 
 
@@ -18,5 +18,5 @@ now u see me server has the dependencies for the following libraries:
 
 ### Server Flowchart
 
-![ServerFlowChart](/Users/gihyunkim/Documents/Univ/now_u_see_me/README/ServerFlowChart.png)
+![ServerFlowChart](/Users/gihyunkim/Documents/Univ/now_u_see_me/now_u_see_me_ubuntu/now_u_see_me_server/resource/ServerFlowChart.png)
 
